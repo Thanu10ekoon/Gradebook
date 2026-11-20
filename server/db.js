@@ -1,8 +1,9 @@
-import mysql from 'mysql2/promise';
+import mysql from 'mysql2';
 
 let pool;
+let promisePool;
 
-export function getPool() {
+export function getDriverPool() {
   if (pool) return pool;
   const password = process.env.DATABASE_PASSWORD;
   if (!password) throw new Error('DATABASE_PASSWORD is required');
@@ -23,6 +24,10 @@ export function getPool() {
     connectTimeout: 8_000,
   });
   return pool;
+}
+
+export function getPool() {
+  return promisePool ??= getDriverPool().promise();
 }
 
 export async function query(sql, values = [], connection = getPool()) {
